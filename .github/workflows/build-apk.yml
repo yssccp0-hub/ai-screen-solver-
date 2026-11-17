@@ -17,7 +17,19 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-      - run: |
+      - name: Lengkapi file Android & Gradle bawaan Flutter
+        run: |
+          flutter create --platforms=android --org com.ai temp_template
+          rm -f ai_screen_solver_flutter/android/settings.gradle ai_screen_solver_flutter/android/build.gradle
+          cp -r temp_template/android/gradlew temp_template/android/gradlew.bat temp_template/android/gradle ai_screen_solver_flutter/android/
+          cp temp_template/android/settings.gradle* temp_template/android/build.gradle* ai_screen_solver_flutter/android/
+          cp -r temp_template/android/app/src/main/res/mipmap-* ai_screen_solver_flutter/android/app/src/main/res/
+          sed -i 's/compileSdk 34/compileSdk 35/g' ai_screen_solver_flutter/android/app/build.gradle
+          sed -i 's/targetSdk 34/targetSdk 35/g' ai_screen_solver_flutter/android/app/build.gradle
+          chmod +x ai_screen_solver_flutter/android/gradlew
+          rm -rf temp_template
+      - name: Build APK Release
+        run: |
           cd ai_screen_solver_flutter
           flutter pub get
           flutter build apk --release
